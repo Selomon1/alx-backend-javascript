@@ -4,15 +4,15 @@ export function taskFirst() {
   return task;
 }
 
+// Utility function used in taskNext
+export function getLast() {
+  return ' is okay';
+}
+
 // Modified function to instantiate variables using let
 export function taskNext() {
   let combination = 'But sometimes let';
   combination += getLast();
 
   return combination;
-}
-
-// Utility function used in taskNext
-export function getLast() {
-  return ' is okay';
 }
