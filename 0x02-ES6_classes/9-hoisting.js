@@ -25,7 +25,7 @@ export class StudentHolberton {
   }
 
   get holbertonClass() {
-    return this._holbertonClass;
+    return this._HolbertonClass;
   }
 
   get fullStudentDescription() {
