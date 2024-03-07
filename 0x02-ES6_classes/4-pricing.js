@@ -19,7 +19,11 @@ class Pricing {
   }
 
   set currency(value) {
-    this._currency = value;
+    if (value instanceof Currency) {
+      this._currency = value;
+    } else {
+      throw new Error('Invalid currency object.');
+    }
   }
 
   displayFullPrice() {
