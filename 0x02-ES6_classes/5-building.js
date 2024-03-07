@@ -1,7 +1,7 @@
 class Building {
   constructor(sqft) {
     this._sqft = sqft;
-    if (this.constructor !== Building && this.evacuationWarningMessage !== 'function') {
+    if (this.constructor !== Building && this.evacuationWarningMessage === undefined) {
       throw Error('Class extending Building must override evacuationWarningMessage');
     }
   }
