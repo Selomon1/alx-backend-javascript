@@ -1,11 +1,9 @@
-function cleanSet(set, startString) {
+export default function cleanSet(set, startString) {
   if (startString === '') {
-    return '';
+    return [...set].join('-');
   }
   return [...set]
     .filter((value) => value.startsWith(startString))
     .map((value) => value.slice(startString.length))
     .join('-');
 }
-
-export default cleanSet;
