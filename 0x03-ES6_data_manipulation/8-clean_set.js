@@ -1,9 +1,19 @@
 export default function cleanSet(set, startString) {
-  if (startString === '') {
-    return [...set].join('-');
+  if (!startString || typeof startString !== 'string') {
+    return '';
   }
-  return [...set]
-    .filter((value) => value.startsWith(startString))
-    .map((value) => value.slice(startString.length))
-    .join('-');
+
+  let result = '';
+
+  set.forEach((value) => {
+    if (typeof value === 'string' && value.startsWith(startString)) {
+      result += `${value.substring(startString.length)}-`;
+    }
+  });
+
+  if (result.endsWith('-')) {
+    result = result.slice(0, -1);
+  }
+
+  return result;
 }
