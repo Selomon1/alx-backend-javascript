@@ -20,9 +20,9 @@ const app = http.createServer((req, res) => {
 					res.write(`Number of students: ${totalStudents}\n`);
 					for (const [field, names] of Object.entries(studentsByField)) {
 						const count = names.length;
-						res.write(`Number of students in ${field}: ${count}. List: ${names.join(', ')}`);
-						res.end();
+						res.write(`Number of students in ${field}: ${count}. List: ${names.join(', ')}\n`);
 					}
+					res.end();
 				})
 				.catch((error) => {
 					res.writeHead(500, { 'Content-Type': 'text/plain' });

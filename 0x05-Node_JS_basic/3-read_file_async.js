@@ -33,7 +33,7 @@ function countStudents(fileName) {
 					console.log(`Number of students in ${field}: ${count}. List: ${names.join(', ')}`);
 				}
 
-				resolve();
+				resolve(studentsByField);
 			})
 			.catch((error) => {
 				console.error(`Error loading database: ${error.message}`);
