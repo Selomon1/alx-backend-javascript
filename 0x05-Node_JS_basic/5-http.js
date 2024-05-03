@@ -1,6 +1,9 @@
 const http = require('http');
 const fs = require('fs');
 
+const hostname = '127.0.0.1';
+const port = 1245;
+
 function countStudents(fileName) {
   return new Promise((resolve, reject) => {
     fs.promises.readFile(fileName, 'utf-8')
@@ -29,7 +32,6 @@ function countStudents(fileName) {
         const totalStudents = Object.values(studentsByField)
           .reduce((sum, names) => sum + names.length, 0);
 
-        // Constructing output based on student data
         let output = `Number of students: ${totalStudents}\n`;
         for (const [field, names] of Object.entries(studentsByField)) {
           const count = names.length;
@@ -45,9 +47,6 @@ function countStudents(fileName) {
   });
 }
 
-const hostname = '127.0.0.1';
-const port = 1245;
-
 const app = http.createServer((req, res) => {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'text/plain');
@@ -55,6 +54,7 @@ const app = http.createServer((req, res) => {
   if (req.url === '/') {
     res.end('Hello Holberton School!');
   } else if (req.url === '/students') {
+    res.write('This is the list of our students\n');
     const fileName = process.argv[2];
 
     if (!fileName) {
@@ -63,17 +63,8 @@ const app = http.createServer((req, res) => {
       return;
     }
 
-    // Check if the database file exists
-    if (!fs.existsSync(fileName)) {
-      res.statusCode = 404;
-      res.end('Error: Database file not found\n');
-      return;
-    }
-
-    // Process student data from the database file
     countStudents(fileName)
       .then((output) => {
-        res.write('This is the list of our students\n');
         res.end(output);
       })
       .catch((error) => {
