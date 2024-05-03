@@ -14,7 +14,8 @@ function countStudents(fileName) {
           if (index === 0) {
             return;
           }
-
+	  
+	  let output = '';
           const fields = line.split(',');
           const firstname = fields[0].trim();
           const field = fields[3].trim();
