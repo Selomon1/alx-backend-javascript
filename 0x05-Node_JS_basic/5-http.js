@@ -1,7 +1,6 @@
 const { readFile } = require('fs');
 const http = require('http');
 
-
 function countStudents(fileName) {
   return new Promise((resolve, reject) => {
     readFile(fileName, 'utf-8', (err, data) => {
@@ -16,7 +15,7 @@ function countStudents(fileName) {
           if (index === 0) {
             return;
           }
-	  
+
           const fields = line.split(',');
           const firstname = fields[0].trim();
           const field = fields[3].trim();
@@ -50,7 +49,7 @@ const app = http.createServer((req, res) => {
     res.write('This is the list of our students\n');
     countStudents(process.argv[2])
       .then((output) => {
-	const data = output.slice(0, -1);
+        const data = output.slice(0, -1);
         res.end(data);
       })
       .catch(() => {
