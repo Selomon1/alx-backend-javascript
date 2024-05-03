@@ -1,43 +1,68 @@
+const { readFile } = require('fs').promises;
 const express = require('express');
-const countStudents = require('./3-read_file_async');
 
 const app = express();
 const PORT = 1245;
 
-app.get('/', (req, res) => {
-  res.type('text').send('Hello Holberton School!');
-});
+function countStudents(fileName) {
+  return readFile(fileName, 'utf-8')
+    .then((data) => {
+      const lines = data.trim().split('\n');
 
-app.get('/students', (req, res) => {
-  const fileName = process.argv[2];
-  if (!fileName) {
-    res.status(400).send('Error: Database file not provided');
-    return;
-  }
+      const studentsByField = {};
 
-  countStudents(fileName)
-    .then((studentsByField) => {
-      const totalStudents = Object.values(studentsByField)
-        .reduce((sum, names) => sum + names.length, 0);
-      let response = 'This is the list of our students\n';
-      response += `Number of students: ${totalStudents}\n`;
+      lines.forEach((line, index) => {
+        if (index === 0) {
+          return;
+        }
 
-      const fields = Object.entries(studentsByField);
-      fields.forEach(([field, names], index) => {
-        const count = names.length;
-        const studentList = names.join(', ');
-        response += `Number of students in ${field}: ${count}. List: ${studentList}`;
-        if (index !== fields.length - 1) {
-          response += '\n';
+        const fields = line.split(',');
+        const firstname = fields[0].trim();
+        const field = fields[3].trim();
+
+        if (firstname && field) {
+          if (!studentsByField[field]) {
+            studentsByField[field] = [];
+          }
+          studentsByField[field].push(firstname);
         }
       });
 
-      res.type('text').send(response);
+      let output = `This is the list of our students\n`;
+      output += `Number of students: ${lines.length - 1}\n`;
+
+      for (const [field, names] of Object.entries(studentsByField)) {
+        output += `Number of students in ${field}: ${names.length}. List: ${names.join(', ')}\n`;
+      }
+
+      return output;
+    })
+    .catch(() => {
+      throw new Error('Cannot load the database');
+  });
+}
+
+
+app.get('/', (req, res) => {
+  res.status(200).send('Hello Holberton School!');
+});
+
+app.get('/students', (req, res) => {
+  res.write('This is the list of our students\n');
+  countStudents(process.argv[2])
+    .then((output) => {
+      res.status(200).send(data);
     })
     .catch((error) => {
-      res.status(500).send(`Error: ${error.message}`);
+      console.error('Error loading database:', error.message);
+      res.status(404).send('Cannot load the database');
     });
 });
+
+app.use((req, res) => {
+  res.status(404).send('Not Found');
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}/`);
