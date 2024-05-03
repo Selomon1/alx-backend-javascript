@@ -20,16 +20,17 @@ const app = http.createServer((req, res) => {
           res.write('This is the list of our students\n');
           res.write(`Number of students: ${totalStudents}\n`);
 
-          Object.entries(studentsByField).forEach(([field, names], index, fieldsArray) => {
+          for (const [field, names] of Object.entries(studentsByField)) {
             const count = names.length;
             const studentList = names.join(', ');
 
-            if (index === fieldsArray.length - 1) {
-              res.write(`Number of students in ${field}: ${count}. List: ${studentList}`);
-            } else {
-              res.write(`Number of students in ${field}: ${count}. List: ${studentList}\n`);
+	    const fieldOutput = `Number of students in ${field}: ${count}. List: ${studentList}`;
+	    res.write(fieldOutput);
+
+	    if (field !== Object.keys(studentsByField)[Object.keys(studentsByField).length - 1]) {
+	      res.write('\n');
             }
-          });
+          }
           res.end();
         })
         .catch((error) => {
