@@ -20,22 +20,26 @@ const app = http.createServer((req, res) => {
           res.write('This is the list of our students\n');
           res.write(`Number of students: ${totalStudents}\n`);
 
-          for (const [field, names] of Object.entries(studentsByField)) {
+        const fields = Object.keys(studentsByField);
+	fields.forEach((field, index) => {
+	  const names = studentsByField[field];
             const count = names.length;
             const studentList = names.join(', ');
 
 	    const fieldOutput = `Number of students in ${field}: ${count}. List: ${studentList}`;
 	    res.write(fieldOutput);
 
-	    if (field !== Object.keys(studentsByField)[Object.keys(studentsByField).length - 1]) {
+	    if (index !== fields.length -1) {
 	      res.write('\n');
-            }
-          }
+	    }
+          });
+
           res.end();
         })
         .catch((error) => {
+	  console.error(`Error processing student data: ${error.message}`);
           res.writeHead(500, { 'Content-Type': 'text/plain' });
-          res.end(`Error: ${error.message}\n`);
+          res.end(`Error: Cannot load the database\n`);
         });
     }
   } else {
