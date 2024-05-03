@@ -48,12 +48,13 @@ const app = http.createServer((req, res) => {
     res.end('Hello Holberton School!');
   } else if (req.url === '/students') {
     res.write('This is the list of our students\n');
-    countStudents(process.argv[2]
+    countStudents(process.argv[2])
       .then((output) => {
-        res.end(output);
+	const data = output.slice(0, -1);
+        res.end(data);
       })
       .catch(() => {
-        res.statusCode = 401;
+        res.statusCode = 404;
         res.end('Cannot load the database');
       });
   } else {
