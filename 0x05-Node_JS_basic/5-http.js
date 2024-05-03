@@ -29,13 +29,10 @@ function countStudents(fileName) {
           }
         });
 
-        const totalStudents = Object.values(studentsByField)
-          .reduce((sum, names) => sum + names.length, 0);
-        let output += `Number of students: ${totalStudents}`;
+        let output = `Number of students: ${lines.length - 1}\n`;
 
         for (const [field, names] of Object.entries(studentsByField)) {
-          const count = names.length;
-          output += `Number of students in ${field}: ${count}. List: ${names.join(', ')}`;
+          output += `Number of students in ${field}: ${names.length}. List: ${names.join(', ')}\n`;
         }
 
         resolve(output);
