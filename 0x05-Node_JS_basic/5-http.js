@@ -1,51 +1,8 @@
 const http = require('http');
-const fs = require('fs');
+const { countStudents } = require('./3-read_file_async'); // Import the countStudents function
 
 const hostname = '127.0.0.1';
 const port = 1245;
-
-function countStudents(fileName) {
-  return new Promise((resolve, reject) => {
-    fs.promises.readFile(fileName, 'utf-8')
-      .then((data) => {
-        const lines = data.trim().split('\n');
-
-        const studentsByField = {};
-
-        lines.forEach((line, index) => {
-          if (index === 0) {
-            return; // Skip the header line
-          }
-
-          const fields = line.split(',');
-          const firstname = fields[0].trim();
-          const field = fields[3].trim();
-
-          if (firstname && field) {
-            if (!studentsByField[field]) {
-              studentsByField[field] = [];
-            }
-            studentsByField[field].push(firstname);
-          }
-        });
-
-        const totalStudents = Object.values(studentsByField)
-          .reduce((sum, names) => sum + names.length, 0);
-
-        let output = `Number of students: ${totalStudents}\n`;
-        for (const [field, names] of Object.entries(studentsByField)) {
-          const count = names.length;
-          output += `Number of students in ${field}: ${count}. List: ${names.join(', ')}\n`;
-        }
-
-        resolve(output);
-      })
-      .catch((error) => {
-        console.error(`Error loading database: ${error.message}`);
-        reject(new Error('Cannot load the database'));
-      });
-  });
-}
 
 const app = http.createServer((req, res) => {
   res.statusCode = 200;
@@ -55,17 +12,29 @@ const app = http.createServer((req, res) => {
     res.end('Hello Holberton School!');
   } else if (req.url === '/students') {
     res.write('This is the list of our students\n');
-    const fileName = process.argv[2];
+    const fileName = process.argv[2]; // Get the database file name from command line args
 
-    if (!fileName || !fs.existsSync(fileName)) {
+    if (!fileName) {
       res.statusCode = 400;
-      res.end('Error: Database file not provided or invalid\n');
+      res.end('Error: Database file not provided\n');
       return;
     }
 
+    // Call the countStudents function with the database file name
     countStudents(fileName)
-      .then((output) => {
-        res.end(output);
+      .then((studentsByField) => {
+        // Build the response based on the studentsByField object
+        const totalStudents = Object.values(studentsByField)
+          .reduce((sum, names) => sum + names.length, 0);
+
+        res.write(`Number of students: ${totalStudents}\n`);
+
+        for (const [field, names] of Object.entries(studentsByField)) {
+          const count = names.length;
+          res.write(`Number of students in ${field}: ${count}. List: ${names.join(', ')}\n`);
+        }
+
+        res.end();
       })
       .catch((error) => {
         console.error(`Error processing student data: ${error.message}`);
