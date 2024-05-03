@@ -13,32 +13,30 @@ const app = http.createServer((req, res) => {
     } else {
       countStudents(fileName)
         .then((studentsByField) => {
+          // Process studentsByField and send response
           const totalStudents = Object.values(studentsByField)
             .reduce((sum, names) => sum + names.length, 0);
+
           res.writeHead(200, { 'Content-Type': 'text/plain' });
           res.write('This is the list of our students\n');
           res.write(`Number of students: ${totalStudents}\n`);
 
-        const fields = Object.keys(studentsByField);
-	fields.forEach((field, index) => {
-	  const names = studentsByField[field];
+          Object.entries(studentsByField).forEach(([field, names], index, fieldsArray) => {
             const count = names.length;
             const studentList = names.join(', ');
-
-	    const fieldOutput = `Number of students in ${field}: ${count}. List: ${studentList}`;
-	    res.write(fieldOutput);
-
-	    if (index !== fields.length -1) {
-	      res.write('\n');
-	    }
+            const fieldOutput = `Number of students in ${field}: ${count}. List: ${studentList}`;
+            res.write(fieldOutput);
+            if (index !== fieldsArray.length - 1) {
+              res.write('\n');
+            }
           });
 
           res.end();
         })
         .catch((error) => {
-	  console.error(`Error processing student data: ${error.message}`);
+          console.error(`Error processing student data: ${error.message}`);
           res.writeHead(500, { 'Content-Type': 'text/plain' });
-          res.end(`Error: Cannot load the database\n`);
+          res.end(`Cannot load the database`);
         });
     }
   } else {
