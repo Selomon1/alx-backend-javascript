@@ -12,7 +12,6 @@ rl.on('line', (input) => {
 	if (name) {
 		console.log(`Your name is: ${name}`);
 		rl.close();
-		console.log('This important software is now closing');
 	}
 });
 
