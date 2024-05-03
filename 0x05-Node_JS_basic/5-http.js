@@ -57,9 +57,9 @@ const app = http.createServer((req, res) => {
     res.write('This is the list of our students\n');
     const fileName = process.argv[2];
 
-    if (!fileName) {
+    if (!fileName || !fs.existsSync(fileName)) {
       res.statusCode = 400;
-      res.end('Error: Database file not provided\n');
+      res.end('Error: Database file not provided or invalid\n');
       return;
     }
 
