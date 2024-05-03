@@ -7,7 +7,7 @@ const rl = readline.createInterface({
 
 console.log('Welcome to Holberton School, what is your name?');
 
-rl.on('line', (input) => {
+rl.question('', (input) => {
   const name = input;
   if (name) {
     console.log(`Your name is: ${name}`);
