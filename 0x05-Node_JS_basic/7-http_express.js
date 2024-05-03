@@ -54,9 +54,8 @@ app.get('/students', (req, res) => {
       const data = output.slice(0, -1);
       res.send(`This is the list of our students\n${data}`);
     })
-    .catch((error) => {
-      console.error('Error handling /students request:', error.message);
-      res.status(404).send('Cannot load the database');
+    .catch(() => {
+      res.status(404).send('This is the list of our students\nCannot load the database');
     });
 });
 
