@@ -1,19 +1,19 @@
 const http = require('http');
-const { readFile } = require('fs');
-
-const hostname = '127.0.0.1';
-const port = 1245;
+const fs = require('fs');
 
 function countStudents(fileName) {
   return new Promise((resolve, reject) => {
-    readFile(fileName, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        const studentsByField = {};
-        const lines = data.toString().split('\n');
+    fs.promises.readFile(fileName, 'utf-8')
+      .then((data) => {
+        const lines = data.trim().split('\n');
 
-        lines.forEach((line) => {
+        const studentsByField = {};
+
+        lines.forEach((line, index) => {
+          if (index === 0) {
+            return; // Skip the header line
+          }
+
           const fields = line.split(',');
           const firstname = fields[0].trim();
           const field = fields[3].trim();
@@ -26,20 +26,27 @@ function countStudents(fileName) {
           }
         });
 
-        const totalStudents = lines.length - 1; // Total number of students
-        const output = `Number of students: ${totalStudents}\n`;
+        const totalStudents = Object.values(studentsByField)
+          .reduce((sum, names) => sum + names.length, 0);
 
-        Object.entries(studentsByField).forEach(([field, names]) => {
+        // Constructing output based on student data
+        let output = `Number of students: ${totalStudents}\n`;
+        for (const [field, names] of Object.entries(studentsByField)) {
           const count = names.length;
-          const studentList = names.join(', ');
-          output += `Number of students in ${field}: ${count}. List: ${studentList}\n`;
-        });
+          output += `Number of students in ${field}: ${count}. List: ${names.join(', ')}\n`;
+        }
 
         resolve(output);
-      }
-    });
+      })
+      .catch((error) => {
+        console.error(`Error loading database: ${error.message}`);
+        reject(new Error('Cannot load the database'));
+      });
   });
 }
+
+const hostname = '127.0.0.1';
+const port = 1245;
 
 const app = http.createServer((req, res) => {
   res.statusCode = 200;
@@ -56,14 +63,14 @@ const app = http.createServer((req, res) => {
       return;
     }
 
-    // Perform database file existence check
+    // Check if the database file exists
     if (!fs.existsSync(fileName)) {
       res.statusCode = 404;
       res.end('Error: Database file not found\n');
       return;
     }
 
-    // Fetch and process student data from the database file
+    // Process student data from the database file
     countStudents(fileName)
       .then((output) => {
         res.write('This is the list of our students\n');
